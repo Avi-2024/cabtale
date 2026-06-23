@@ -40,8 +40,7 @@ class RideRequestCreate extends FormRequest
                 'sometimes',
                 'nullable',
                 'date',
-                'after:' . now()->addHours(2)->toDateTimeString(),
-                'before:' . now()->addHours(2)->addMinutes(1)->toDateTimeString(),
+                'after:now',
             ],
         ];
     }

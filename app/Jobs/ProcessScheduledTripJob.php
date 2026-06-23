@@ -72,7 +72,8 @@ class ProcessScheduledTripJob implements ShouldQueue
                     'description' => translate($push['description']),
                     'ride_request_id' => $final->id,
                     'type' => $final->type,
-                    'action' => 'new_ride_request_notification'
+                    'action' => 'new_ride_request_notification',
+                    'scheduled_at' => $final->scheduled_at?->toDateTimeString(),
                 ];
 
                 if (!empty($notify)) {

@@ -63,6 +63,7 @@ class TripRequestResource extends JsonResource
             'rise_request_count' => $this->rise_request_count,
             'type' => $this->type,
             'created_at' => $this->created_at,
+            'scheduled_at' => $this->scheduled_at,
             'entrance' => $this->entrance,
             'encoded_polyline' => $this->encoded_polyline,
             'customer_review' => !($this->customerReceivedReview == null),

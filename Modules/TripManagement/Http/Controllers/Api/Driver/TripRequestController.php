@@ -9,6 +9,7 @@ use App\Events\DriverTripCancelledEvent;
 use App\Events\DriverTripCompletedEvent;
 use App\Events\DriverTripStartedEvent;
 use App\Jobs\SendPushNotificationJob;
+use App\Jobs\SendScheduledTripReminderJob;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Exception;
@@ -306,6 +307,12 @@ class TripRequestController extends Controller
         $trip->tripStatus()->update([
             'accepted' => now()
         ]);
+        if ($trip->scheduled_at) {
+            $reminderTime = Carbon::parse($trip->scheduled_at)->subMinutes(30);
+            if ($reminderTime->isFuture()) {
+                SendScheduledTripReminderJob::dispatch($trip->id)->delay($reminderTime);
+            }
+        }
         //deleting exiting rejected driver request for this trip
         $this->rejectedRequest->destroyData([
             'column' => 'trip_request_id',

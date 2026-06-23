@@ -125,6 +125,7 @@ class TripRequestRepository implements TripRequestInterfaces
             $trip->type = $attributes['type'];
             $trip->entrance = $attributes['entrance'] ?? null;
             $trip->encoded_polyline = $attributes['encoded_polyline'] ?? null;
+            $trip->scheduled_at = $attributes['scheduled_at'] ?? null;
             $trip->save();
 
             $trip->tripStatus()->create([

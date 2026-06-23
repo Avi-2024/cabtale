@@ -48,7 +48,8 @@ class CustomerTripRequestEvent implements ShouldBroadcast
     {
         return [
             'id'=>$this->user->id,
-            'trip_id'=>$this->tripRequest->id
+            'trip_id'=>$this->tripRequest->id,
+            'scheduled_at'=>$this->tripRequest->scheduled_at?->toDateTimeString(),
         ];
     }
 }

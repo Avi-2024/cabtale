@@ -48,7 +48,6 @@ use Modules\UserManagement\Lib\LevelUpdateCheckerTrait;
 use Modules\UserManagement\Transformers\LastLocationResource;
 use Modules\ZoneManagement\Interfaces\ZoneInterface;
 use Modules\TransactionManagement\Traits\TransactionTrait;
-use App\Jobs\ProcessScheduledTripJob;
 
 class TripRequestController extends Controller
 {
@@ -480,7 +479,8 @@ class TripRequestController extends Controller
             'receiver_address' => 'required_if:type,==,parcel',
             'parcel_category_id' => 'required_if:type,==,parcel',
             'weight' => 'required_if:type,==,parcel',
-            'payer' => 'required_if:type,==,parcel'
+            'payer' => 'required_if:type,==,parcel',
+            'scheduled_at' => 'sometimes|nullable|date|after:now',
         ]);
 
         if ($validator->fails()) {
@@ -570,7 +570,8 @@ class TripRequestController extends Controller
                 'description' => translate($push['description']),
                 'ride_request_id' => $final->id,
                 'type' => $final->type,
-                'action' => 'new_ride_request_notification'
+                'action' => 'new_ride_request_notification',
+                'scheduled_at' => $final->scheduled_at?->toDateTimeString(),
             ];
             if (!empty($notify)) {
 

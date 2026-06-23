@@ -827,24 +827,7 @@ class TripRequestService extends BaseService implements TripRequestServiceInterf
     {
         $save_trip = $this->storeTrip(attributes: $request->request->all());
 
-        // If scheduled, dispatch job to fire at scheduled time — skip immediate driver search
-        if (!empty($request->scheduled_at)) {
-            $scheduledAt = \Carbon\Carbon::parse($request->scheduled_at);
-            
-            // Dispatch job to notify drivers at scheduled time
-            \App\Jobs\ProcessScheduledTripJob::dispatch($save_trip->id)
-                ->delay($scheduledAt);
-            
-            // Dispatch customer reminder 30 minutes before scheduled time
-            $customerReminderTime = $scheduledAt->copy()->subMinutes(30);
-            if ($customerReminderTime->isFuture()) {
-                \App\Jobs\SendCustomerScheduledTripReminderJob::dispatch($save_trip->id)
-                    ->delay($customerReminderTime);
-            }
-            
-            return new TripRequestResource($save_trip);
-        }
-
+        // Scheduled rides continue through immediate driver search.
         $search_radius = (float)(get_cache('search_radius') ?? 5);
         if ($search_radius <= 0) {
             $search_radius = 5;
@@ -865,7 +848,8 @@ class TripRequestService extends BaseService implements TripRequestServiceInterf
                 'description' => translate($push['description']),
                 'ride_request_id' => $save_trip->id,
                 'type' => $save_trip->type,
-                'action' => 'new_ride_request_notification'
+                'action' => 'new_ride_request_notification',
+                'scheduled_at' => $save_trip->scheduled_at?->toDateTimeString(),
             ];
             $notify = [];
             foreach ($find_drivers as $key => $value) {
